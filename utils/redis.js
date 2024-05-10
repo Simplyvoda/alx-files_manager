@@ -24,6 +24,7 @@ class RedisClient {
 
   async get(key) {
     // get the value from the redis database
+	console.log("get is running", key)
 	return promisify(this.client.GET).bind(this.client)(key);
   }
 
