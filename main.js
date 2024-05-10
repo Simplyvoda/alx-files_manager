@@ -1,7 +1,7 @@
 import redisClient from './utils/redis';
 
 (async () => {
-    console.log(await redisClient.isAlive(), "checking if alive");
+    console.log(redisClient.isAlive(), "checking if alive");
     console.log(await redisClient.get('myKey'), "get mykey");
     await redisClient.set('myKey', 12, 5);
     console.log(await redisClient.get('myKey'), "get mykey w duration");

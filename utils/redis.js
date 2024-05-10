@@ -4,20 +4,21 @@ import { createClient } from "redis";
 class RedisClient {
   constructor() {
     this.client = createClient();
+	this.isConnected = true;
 
     // log to the console on error
-    this.client.on("error", (err) => console.log("Redis Client Error", err))
+    this.client.on("error", (err) => { 
+		console.log("Redis Client Error", err);
+		this.isConnected = false;
+	})
+
+	this.client.on('connect', () => {
+        this.isConnected = true;
+    })
   }
 
   async isAlive() {
-    // return a promise resolving to either true or false based on the connection
-	this.client.on('connect', () => {
-		return true;
-	})
-
-	this.client.on('error', () => {
-        return false;
-    })
+    return this.isConnected
   }
 
   async get(key) {
