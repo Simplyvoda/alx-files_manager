@@ -30,14 +30,12 @@ class RedisClient {
 
   async set(key, value, dur) {
     // set the value in the redis database for the specified duration
-	console.log("set is running", key);
-	await promisify(this.client.SETEX)
-	.bind(this.client)(key, dur, value);
+	return await this.client.setex(key, dur, value)
   }
 
   async del(key) {
     // delete the value from the redis database
-    await promisify(this.client.DEL).bind(this.client)(key);
+    return await this.client.del(key)
   }
 }
 
