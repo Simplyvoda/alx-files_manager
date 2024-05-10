@@ -4,7 +4,7 @@ import { redisClient } from '../utils/redis.js'
 
 export default class UsersController {
     static async postNew(req, res){
-        const { email, password }= req.body;
+        const { email, password } = req.body;
 
         if (email === ""){
             res.status(400).json({
@@ -17,7 +17,7 @@ export default class UsersController {
             });
         }
 
-        const existingUser = await dbClient.usersCollection.findOne({ email });
+        const existingUser = await (await dbClient.usersCollection()).findOne({ email });
         console.log(existingUser)
 
         if (existingUser){
@@ -32,7 +32,7 @@ export default class UsersController {
             }
 
             // adding user to database
-            const res = await dbClient.usersCollection.insertOne(newUser);
+            const res = await (await dbClient.usersCollection()).insertOne(newUser);
             const generatedId = res.insertedId;
             res.status(201).json({
                 "id" : generatedId,
