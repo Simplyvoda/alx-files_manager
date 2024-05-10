@@ -4,17 +4,20 @@ import { redisClient } from '../utils/redis.js'
 
 export default class UsersController {
     static async postNew(req, res){
-        const { email, password } = req.body;
+        const email = req.body ? req.body.email : null;
+        const password = req.body ? req.body.password : null;
 
         if (email === ""){
             res.status(400).json({
                 "error" : "Missing email"
             });
+            return;
         }
         if (password === ""){
             res.status(400).json({
                 "error" : "Missing password"
             });
+            return;
         }
 
         console.log(email, password)
@@ -25,6 +28,7 @@ export default class UsersController {
             res.status(400).json({
                 "error" : "Already exist"
             });
+            return;
         }else{
             const hashedPassword = sha1(password);
             const newUser = {
