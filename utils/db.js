@@ -4,13 +4,13 @@ import { MongoClient } from 'mongodb';
 const host = process.env.DB_HOST || 'localhost';
 const port = process.env.DB_PORT || 27017;
 const database = process.env.DB_DATABASE || 'files_manager';
+const db_uri = `mongodb://${host}:${port}/${database}`;
 
 class DBClient {
     constructor() {
-        this.client = new MongoClient(`mongodb://${host}:${port}/${database}`);
+        this.client = new MongoClient(db_uri, { useUnifiedTopology: true });
 
         this.client.connect();
-
     }
 
     isAlive() {
