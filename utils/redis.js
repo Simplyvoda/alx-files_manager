@@ -6,7 +6,7 @@ class RedisClient {
     this.client = createClient();
 
     // log to the console on error
-    this.client.on("error", (err) => console.log("Redis Client Error", err));
+    this.client.on("error", (err) => console.log("Redis Client Error", err))
   }
 
   async isAlive() {
@@ -14,7 +14,7 @@ class RedisClient {
     return new Promise((resolve, reject) => {
       this.client.on("connect", () => resolve(true));
       this.client.on("error", () => resolve(false));
-    });
+    }).then((res) => {return res});
   }
 
   async get(key) {
