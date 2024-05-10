@@ -25,20 +25,20 @@ class RedisClient {
   async get(key) {
     // get the value from the redis database
     console.log("get is running", key);
-    const getAsync = promisify(this.client.get).bind(this.client);
+    const getAsync = promisify(this.client.GET).bind(this.client);
     return getAsync(key);
   }
 
   async set(key, value, dur) {
     // set the value in the redis database for the specified duration
 	console.log("set is running", key);
-	await promisify(this.client.setex)
+	await promisify(this.client.SETEX)
 	.bind(this.client)(key, dur, value);
   }
 
   async del(key) {
     // delete the value from the redis database
-    await promisify(this.client.del).bind(this.client)(key);
+    await promisify(this.client.DEL).bind(this.client)(key);
   }
 }
 
