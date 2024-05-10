@@ -1,4 +1,5 @@
 // Class contains the redis client
+import { promisify } from "util";
 import { createClient } from "redis";
 
 class RedisClient {
@@ -29,7 +30,7 @@ class RedisClient {
   async set(key, value, dur) {
     // set the value in the redis database for the specified duration
 	await promisify(this.client.SETEX)
-	.bind(this.client)(key, duration, value);
+	.bind(this.client)(key, dur, value);
   }
 
   async del(key) {
