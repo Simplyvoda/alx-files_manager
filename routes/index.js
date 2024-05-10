@@ -8,3 +8,5 @@ router.get('/status', AppController.getStatus);
 
 // GET /stats => AppController.getStats
 router.get('/stats', AppController.getStats);
+
+module.exports = router;
