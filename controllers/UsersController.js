@@ -17,6 +17,7 @@ export default class UsersController {
             });
         }
 
+        console.log(email, password)
         const existingUser = await (await dbClient.usersCollection()).findOne({ email });
         console.log(existingUser)
 
