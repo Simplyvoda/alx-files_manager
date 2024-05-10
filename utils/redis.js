@@ -24,9 +24,8 @@ class RedisClient {
 
   async get(key) {
     // get the value from the redis database
-    console.log("get is running", key);
-    const getAsync = promisify(this.client.GET).bind(this.client);
-    return getAsync(key);
+	const data = await this.client.get(key)
+    return data;
   }
 
   async set(key, value, dur) {
