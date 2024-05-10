@@ -1,5 +1,5 @@
 // Class contains the redis client
-import { promisify } from "util";
+import { promisify } from "util" ;
 import { createClient } from "redis";
 
 class RedisClient {
@@ -18,7 +18,7 @@ class RedisClient {
     })
   }
 
-  async isAlive() {
+  isAlive() {
     return this.isConnected
   }
 
@@ -39,6 +39,6 @@ class RedisClient {
   }
 }
 
-const redisClient = new RedisClient();
+export const redisClient = new RedisClient();
 
-module.exports = redisClient;
+export default redisClient;
