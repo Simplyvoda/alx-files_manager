@@ -9,4 +9,7 @@ router.get('/status', AppController.getStatus);
 // GET /stats => AppController.getStats
 router.get('/stats', AppController.getStats);
 
+// POST /users => UsersController.postNew
+router.post('/users', UsersController.postNew);
+
 module.exports = router;
