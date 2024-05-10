@@ -11,10 +11,13 @@ class RedisClient {
 
   async isAlive() {
     // return a promise resolving to either true or false based on the connection
-    return new Promise((resolve, reject) => {
-      this.client.on("connect", () => resolve(true));
-      this.client.on("error", () => resolve(false));
-    }).then((res) => {return res});
+	this.client.on('connect', () => {
+		return true;
+	})
+
+	this.client.on('error', () => {
+        return false;
+    })
   }
 
   async get(key) {
