@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import sha1 from "sha1";
 import { dbClient } from '../utils/db.js';
 import { redisClient } from '../utils/redis.js';
-import { ObjectId } from'mongodb';
+import { ObjectId } from 'mongodb';
 
 
 export default class AuthController {

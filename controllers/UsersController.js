@@ -47,11 +47,11 @@ export default class UsersController {
 
     static async getMe(req, res){
         // retrieve details of logged in user
-        console.log(req.headers, "check for token")
         const token = req.headers['x-token'];
         const key = `auth_${token}`;
 
         const user_id = await redisClient.get(key);
+        // have to convert to mongo object id before searching database
         const objectId = ObjectId(user_id);
         const user = await (await dbClient.usersCollection()).findOne({
             _id: objectId,
