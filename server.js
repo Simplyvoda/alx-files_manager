@@ -1,12 +1,13 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import routes from './routes/index.js';
 
 const app = express();
 
 const port = process.env.PORT || 5000;
 
-// adding a middleware function
-// app.use(express.json());
+// Use body-parser middleware
+app.use(bodyParser.json());
 
 // load all routes from routes/index.js
 app.use(routes);
