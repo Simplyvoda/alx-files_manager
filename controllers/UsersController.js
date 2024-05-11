@@ -1,6 +1,7 @@
 import sha1 from 'sha1';
 import { dbClient } from '../utils/db.js'
 import { redisClient } from '../utils/redis.js'
+import { ObjectId } from 'mongodb';
 
 export default class UsersController {
     static async postNew(req, res){
@@ -50,11 +51,10 @@ export default class UsersController {
         const token = req.headers['x-token'];
         const key = `auth_${token}`;
 
-
         const user_id = await redisClient.get(key);
-        console.log(user_id, "user id check if to be converted");
+        const objectId = ObjectId(user_id);
         const user = await (await dbClient.usersCollection()).findOne({
-            _id: user_id,
+            _id: objectId,
         });
 
         if (!user){

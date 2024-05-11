@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import sha1 from "sha1";
 import { dbClient } from '../utils/db.js';
 import { redisClient } from '../utils/redis.js';
+import { ObjectId } from'mongodb';
 
 
 export default class AuthController {
@@ -64,8 +65,9 @@ export default class AuthController {
 
         // retrieve user based on token
         const user_id = await redisClient.get(key);
+        const objectId = ObjectId(user_id);
         const user = await (await dbClient.usersCollection()).findOne({
-            _id: user_id
+            _id: objectId
         });
 
         if (!user) {
