@@ -6,10 +6,9 @@ import { redisClient } from '../utils/redis.js';
 
 export default class AuthController{
     static async getConnect(req, res){
-        const authHeader = req.headers['Authorization'];
+        const authHeader = req.headers['authorization'];
 
         console.log(authHeader, "check auth header");
-        console.log(req, "logging the whole request");
 
         if (!authHeader || !authHeader.startsWith('Basic ')){
             res.status(401).json({
