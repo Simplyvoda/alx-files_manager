@@ -14,7 +14,14 @@ export default class FilesController {
         });
 
         if(user){
-            
+            const { name, type, parentId, isPublic, data } = req.body;
+
+            if (!name || name === ""){
+                res.status(404).send("Missing name");
+            }
+            if (!type || type === ""){
+                res.status(404).send("Missing type");
+            }
 
         }else{
             res.status(401).json({
