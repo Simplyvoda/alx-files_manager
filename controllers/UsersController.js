@@ -4,7 +4,6 @@ import { redisClient } from '../utils/redis.js'
 
 export default class UsersController {
     static async postNew(req, res){
-        console.log("Request Body:", req.body); 
         const email = req.body ? req.body.email : null;
         const password = req.body ? req.body.password : null;
 
@@ -21,9 +20,7 @@ export default class UsersController {
             return;
         }
 
-        console.log(email, password)
         const existingUser = await (await dbClient.usersCollection()).findOne({ email });
-        console.log(existingUser)
 
         if (existingUser){
             res.status(400).json({
@@ -43,6 +40,29 @@ export default class UsersController {
             res.status(201).json({
                 "id" : generatedId,
                 "email": newUser.email
+            });
+        }
+    }
+
+    static async getMe(req, res){
+        // retrieve details of logged in user
+        const token = req.headers['X-Token'];
+        const key = `auth_${token}`;
+
+        const user_id = await redisClient.get(key);
+        const user = await (await dbClient.usersCollection()).findOne({
+            _id: user_id
+        });
+
+        if (!user){
+            res.status(401).json({
+                "error" : "Unauthorized"
+            });
+            return;
+        }else{
+            res.status(200).json({
+                "id" : user._id,
+                "email": user.email
             });
         }
     }
