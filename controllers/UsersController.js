@@ -46,7 +46,7 @@ export default class UsersController {
 
     static async getMe(req, res){
         // retrieve details of logged in user
-        console.log(req, "check for token")
+        console.log(req.headers, "check for token")
         const token = req.headers['x-token'];
         const key = `auth_${token}`;
 
