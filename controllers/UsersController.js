@@ -52,8 +52,9 @@ export default class UsersController {
 
 
         const user_id = await redisClient.get(key);
+        console.log(user_id, "user id check if to be converted");
         const user = await (await dbClient.usersCollection()).findOne({
-            _id: user_id
+            _id: user_id,
         });
 
         if (!user){
