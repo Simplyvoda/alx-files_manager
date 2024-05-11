@@ -47,17 +47,18 @@ export default class AuthController {
             try {
                 await redisClient.set(key, user._id.toString(), 60 * 60 * 24)
                 const result = await redisClient.get(key);
-
-                console.log(result, "the reslt was saved successfully");
-
+                console.log(result, "the result was saved successfully");
+            
                 // return the token to the user
                 res.status(200).json({
                     "token": token
                 });
                 return;
-            } catch (e) {
-                res.status(500);
+            } catch (error) {
+                console.error("Error occurred while setting/getting Redis data:", error);
+                res.status(500).json({ error: "Internal Server Error" });
             }
+            
 
         }
 
