@@ -3,9 +3,7 @@ import { dbClient } from '../utils/db.js';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { promisify } from 'util';
-import {
-    mkdir, writeFile, stat, existsSync, realpath,
-} from 'fs';
+import { writeFile, existsSync, mkdirSync} from 'fs';
 import { tmpdir } from 'os';
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -81,6 +79,10 @@ export default class FilesController {
             } else {
                 // type is image or file
                 const folderPath = FOLDER_PATH;
+                // check if folder path exists and create it if it does not exist
+                if(!existsSync(folderPath)){
+                    mkdirSync(folderPath);
+                }
                 const filename = uuidv4();
                 const localPath = `${folderPath}/${filename}`;
                 // decoding the file
