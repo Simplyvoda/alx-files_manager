@@ -36,21 +36,24 @@ export default class AuthController{
                 "error" : "Unauthorized"
             });
             return;
+        }else{
+            
+            // generate a token for the user if authorized
+            const token = uuidv4();
+    
+            // store the token in redis - redis setex stores in seconds
+            const key = `auth_${token}`;
+            await redisClient.set(key, user._id.toString(), 60*60*24)
+    
+            // return the token to the user
+            res.status(200).json({
+                "token" : token
+            });
+    
+            console.log(token, "Token")
+
         }
 
-        // generate a token for the user if authorized
-        const token = uuidv4();
-
-        // store the token in redis - redis setex stores in seconds
-        const key = `auth_${token}`;
-        await redisClient.set(key, user._id.toString(), 60*60*24)
-
-        // return the token to the user
-        res.status(200).json({
-            "token" : token
-        });
-
-        console.log(token, "Token")
     }
 
     static async getDisconnect(req, res){
