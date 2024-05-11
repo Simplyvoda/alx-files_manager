@@ -71,6 +71,7 @@ export default class FilesController {
                 const newFileId = newFileInfo.insertedId.toString();
                 res.status(201).json({
                     "id": newFileId,
+                    "userId": userId,
                     "name": name,
                     "type": type,
                     "isPublic": isPublic,
@@ -94,6 +95,7 @@ export default class FilesController {
                 const newFileId = newFileInfo.insertedId.toString();
                 res.status(201).json({
                     "id": newFileId,
+                    "userId": userId,
                     "name": name,
                     "type": type,
                     "isPublic": isPublic,
