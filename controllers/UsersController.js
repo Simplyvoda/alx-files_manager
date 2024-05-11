@@ -49,6 +49,8 @@ export default class UsersController {
         const token = req.headers['x-token'];
         const key = `auth_${token}`;
 
+        console.log(req.headers, "check for token")
+
         const user_id = await redisClient.get(key);
         const user = await (await dbClient.usersCollection()).findOne({
             _id: user_id
