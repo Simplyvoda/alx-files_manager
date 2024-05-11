@@ -8,6 +8,7 @@ export default class AuthController {
     static async getConnect(req, res) {
         const authHeader = req.headers['authorization'];
 
+        console.log("will this log ?")
         console.log("Auth header: " + authHeader);
         console.log(req, "checking request object")
 
@@ -31,7 +32,6 @@ export default class AuthController {
             password: sha1(password)
         });
 
-        console.log(user, "User with email and password");
 
         // return 401 for unauthorized user
         if (!user) {
@@ -42,17 +42,10 @@ export default class AuthController {
         } else {
             // generate a token for the user if authorized
             const token = uuidv4();
-            console.log(token, "Token ran")
-
             // store the token in redis - redis setex stores in seconds
             const key = `auth_${token}`;
-            console.log(key, "Key ran")
             try {
-                console.log("attempting to store token in redis")
-                console.log(await redisClient.set(key, user._id.toString(), 60 * 60 * 24))
-                const result = await redisClient.get(key);
-                console.log(result, "the result was saved successfully");
-            
+                await redisClient.set(key, user._id.toString(), 60 * 60 * 24);
                 // return the token to the user
                 res.status(200).json({
                     "token": token
