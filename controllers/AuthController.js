@@ -8,8 +8,6 @@ export default class AuthController{
     static async getConnect(req, res){
         const authHeader = req.headers['authorization'];
 
-        console.log(authHeader, "check auth header");
-
         if (!authHeader || !authHeader.startsWith('Basic ')){
             res.status(401).json({
                 "error" : "Unauthorized"
@@ -24,11 +22,13 @@ export default class AuthController{
         const decodedCred = Buffer.from(encodedCred, 'base64').toString();
         const [email, password] = decodedCred.split(':');
 
-        // check for user with wmail ams password
+        // check for user with email and password
         const user = await (await dbClient.usersCollection()).findOne({
-            email: email,
+            email,
             password:  sha1(password)
         });
+        
+        console.log(user, "User with email and password");
 
         // return 401 for unauthorized user
         if (!user){
@@ -53,7 +53,7 @@ export default class AuthController{
 
     static async getDisconnect(req, res){
         // retrieving token from the request header
-        const token = req.headers['X-Token'];
+        const token = req.headers['x-token'];
         const key = `auth_${token}`;
 
         // retrieve user based on token
