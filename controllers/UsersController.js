@@ -46,7 +46,7 @@ export default class UsersController {
 
     static async getMe(req, res){
         // retrieve details of logged in user
-        const token = req.headers['X-Token'];
+        const token = req.headers['x-token'];
         const key = `auth_${token}`;
 
         const user_id = await redisClient.get(key);
