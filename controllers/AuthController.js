@@ -1,4 +1,4 @@
-import uuid from "uuid";
+import { v4 as uuidv4 } from 'uuid';
 import sha1 from "sha1";
 import { dbClient } from '../utils/db.js';
 import { redisClient } from '../utils/redis.js';
@@ -39,7 +39,7 @@ export default class AuthController{
         }
 
         // generate a token for the user if authorized
-        const token = uuid.v4();
+        const token = uuidv4();
 
         // store the token in redis - redis setex stores in seconds
         const key = `auth_${token}`;
