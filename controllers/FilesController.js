@@ -3,11 +3,13 @@ import { dbClient } from '../utils/db.js';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { promisify } from 'util';
-import { writeFile, existsSync, mkdirSync} from 'fs';
+import { writeFile, existsSync, mkdirSync } from 'fs';
 import { tmpdir } from 'os';
+import { error } from 'console';
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
 const writeFileAsync = promisify(writeFile);
+const PAGE_SIZE = 20;
 
 export default class FilesController {
     static async postUpload(req, res) {
@@ -39,7 +41,7 @@ export default class FilesController {
             if (!base64Data && !['folder'].includes(type)) {
                 res.status(400).json({ error: "Missing data" });
             }
-            if (parentId ) {
+            if (parentId) {
                 // check if parentfile exists in db for this id
                 const parentObjId = ObjectId(parentId);
                 const parentFile = await (await dbClient.filesCollection()).findOne({
@@ -81,7 +83,7 @@ export default class FilesController {
                 // type is image or file
                 const folderPath = FOLDER_PATH;
                 // check if folder path exists and create it if it does not exist
-                if(!existsSync(folderPath)){
+                if (!existsSync(folderPath)) {
                     mkdirSync(folderPath);
                 }
                 const filename = uuidv4();
@@ -90,7 +92,7 @@ export default class FilesController {
                 const fileData = Buffer.from(base64Data, 'base64');
                 // writing the file to disk
                 await writeFileAsync(localPath, fileData);
-                const updatedFileDoc = {...folderDoc, localPath: localPath}
+                const updatedFileDoc = { ...folderDoc, localPath: localPath }
                 const newFileInfo = await (await dbClient.filesCollection()).insertOne(updatedFileDoc);
                 const newFileId = newFileInfo.insertedId.toString();
                 res.status(201).json({
@@ -109,6 +111,74 @@ export default class FilesController {
                 "error": "Unauthorized"
             });
             return;
+        }
+
+
+    }
+
+    static async getShow(req, res) {
+        // retrieve user based on token
+        const token = req.headers['x-token'];
+        const key = `auth_${token}`;
+
+        const user_id = await redisClient.get(key);
+
+        const user = await (await dbClient.usersCollection()).findOne({
+            _id: ObjectId(user_id)
+        });
+
+        if (user) {
+            const file_id = req.params.id;
+            const file = await (await dbClient.filesCollection()).findOne({
+                _id: ObjectId(file_id),
+                userId: ObjectId(user_id)
+            });
+
+            if (!file) {
+                res.status(404).json({ error: "Not found" });
+            } else {
+                res.status(200).json(file);
+            }
+
+        } else {
+            res.status(401).json({ error: "Unauthorized" })
+        }
+
+    }
+
+    static async getIndex(req, res) {
+        // retrieve user based on token
+        const token = req.headers['x-token'];
+        const key = `auth_${token}`;
+
+        const user_id = await redisClient.get(key);
+
+        const user = await (await dbClient.usersCollection()).findOne({
+            _id: ObjectId(user_id)
+        });
+        if (user) {
+            const { parentId, page } = req.query;
+            parentId ? parentId : '0';
+            page ? parseInt(page) : 0;
+
+            const skip = page * PAGE_SIZE;
+
+            // Construct the aggregation pipeline
+            // try and add checks for parentId - no need to convert to ObjectId if its 0
+            const pipeline = [
+                { $match: { parentId: ObjectId(parentId), userId: user._id } },
+                { $skip: skip },
+                { $limit: PAGE_SIZE }
+            ];
+
+            // Execute the aggregation pipeline
+            const results = await (await dbClient.filesCollection()).aggregate(pipeline).toArray();
+
+            // Return the paginated results
+            res.status(200).json(results);
+
+        } else {
+            res.status(401).json({ error: "Unauthorized" })
         }
 
 
