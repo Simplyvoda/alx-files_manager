@@ -8,13 +8,13 @@ export default class UsersController {
         const email = req.body ? req.body.email : null;
         const password = req.body ? req.body.password : null;
 
-        if (email === ""){
+        if (email === "" || !email){
             res.status(400).json({
                 "error" : "Missing email"
             });
             return;
         }
-        if (password === ""){
+        if (password === "" || !password){
             res.status(400).json({
                 "error" : "Missing password"
             });
