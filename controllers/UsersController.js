@@ -38,8 +38,8 @@ export default class UsersController {
             }
 
             // adding user to database
-            const res = await (await dbClient.usersCollection()).insertOne(newUser);
-            const generatedId = res.insertedId;
+            const result = await (await dbClient.usersCollection()).insertOne(newUser);
+            const generatedId = result.insertedId;
             res.status(201).json({
                 "id" : generatedId,
                 "email": newUser.email
