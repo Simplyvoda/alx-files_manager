@@ -2,6 +2,7 @@ import { redisClient } from '../utils/redis.js';
 import { dbClient } from '../utils/db.js';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
+import { promisify } from 'util';
 import {
     mkdir, writeFile, stat, existsSync, realpath,
 } from 'fs';
