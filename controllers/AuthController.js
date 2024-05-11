@@ -9,7 +9,7 @@ export default class AuthController {
         const authHeader = req.headers['authorization'];
 
         console.log("Auth header: " + authHeader);
-        console.log(req.headers)
+        console.log(req, "checking request object")
 
         if (!authHeader || !authHeader.startsWith('Basic ')) {
             res.status(401).json({
