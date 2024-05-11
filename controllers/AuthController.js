@@ -45,7 +45,8 @@ export default class AuthController {
             const key = `auth_${token}`;
             console.log(key, "Key ran")
             try {
-                await redisClient.set(key, user._id.toString(), 60 * 60 * 24)
+                console.log("attempting to store token in redis")
+                console.log(await redisClient.set(key, user._id.toString(), 60 * 60 * 24))
                 const result = await redisClient.get(key);
                 console.log(result, "the result was saved successfully");
             
