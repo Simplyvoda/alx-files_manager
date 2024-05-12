@@ -148,8 +148,9 @@ export default class FilesController {
         console.log("check if user id is same as 663f6c4a68e5d501cd277087 for redis object id", user._id)
 
         if (user) {
+            console.log(user, "why does user work but file does not")
             const userId = user_id.toString();
-            const file_id = req.params.id ? req.params.id : NULL_ID;
+            const file_id = req.params.id ? req.params.id.toString() : NULL_ID;
 
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
@@ -194,7 +195,8 @@ export default class FilesController {
         });
 
         if (user) {
-            const parentId = req.query.parentId || '0';
+            console.log(user, "why does user work but file does not")
+            const parentId = req.query.parentId ? req.query.parentId.toString() : '0';
             const page = /\d+/.test((req.query.page || '').toString())
                 ? Number.parseInt(req.query.page, 10)
                 : 0;
