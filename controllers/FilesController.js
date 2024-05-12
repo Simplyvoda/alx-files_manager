@@ -175,6 +175,8 @@ export default class FilesController {
             parentId ? parentId : '0';
             page ? parseInt(page) : 0;
 
+            console.log("logging parent id and page", parentId, page)
+
             const skip = page * PAGE_SIZE;
 
             // Construct the aggregation pipeline
