@@ -187,6 +187,7 @@ export default class FilesController {
         });
 
         if (user) {
+            const userId = user_id.toString();
             const parentId = req.query.parentId ? req.query.parentId.toString() : '0';
             const page = /\d+/.test((req.query.page || '').toString())
                 ? Number.parseInt(req.query.page, 10)
@@ -195,7 +196,7 @@ export default class FilesController {
             const skip = page * PAGE_SIZE;
 
             const filesFilter = {
-                userId: ObjectId(user_id).toString(),
+                userId: ObjectId(userId).toString(),
                 parentId: parentId === '0'
                   ? parentId
                   : ObjectId(parentId),
@@ -251,10 +252,11 @@ export default class FilesController {
         });
 
         if (user) {
+            const userId = user_id.toString();
             const file_id = req.params.id;
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
-                userId: ObjectId(user_id).toString(),
+                userId: ObjectId(userId).toString(),
             });
 
             if (!file) {
@@ -296,10 +298,11 @@ export default class FilesController {
         });
 
         if (user) {
+            const userId = user_id.toString();
             const file_id = req.params.id;
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
-                userId: ObjectId(user_id).toString(),
+                userId: ObjectId(userId).toString(),
             });
 
             if (!file) {
@@ -339,11 +342,12 @@ export default class FilesController {
         });
 
         if (user) {
+            const userId = user_id.toString();
             const file_id = req.params.id;
             const size = req.query.size || null;
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
-                userId: ObjectId(user_id).toString(),
+                userId: ObjectId(userId).toString(),
             });
 
             // if the user is not the owner of the file
