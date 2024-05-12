@@ -198,7 +198,7 @@ export default class FilesController {
                 userId: ObjectId(user_id).toString(),
                 parentId: parentId === '0'
                   ? parentId
-                  : ObjectId(parentId).toString(),
+                  : ObjectId(parentId),
               };
           
 
