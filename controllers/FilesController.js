@@ -152,21 +152,21 @@ export default class FilesController {
                 _id: ObjectId(file_id),
                 userId: ObjectId(userId).toString(),
             });
-            
+
             if (!file) {
                 res.status(404).json({ error: "Not found" });
             } else {
                 console.log("check if file was found", file)
                 res.status(200).json({
-                    file_id,
+                    id: file_id,
                     userId,
                     name: file.name,
                     type: file.type,
                     isPublic: file.isPublic,
                     parentId: file.parentId === '0'
-                      ? 0
-                      : file.parentId.toString(),
-                  });
+                        ? 0
+                        : file.parentId.toString(),
+                });
             }
 
         } else {
@@ -198,10 +198,10 @@ export default class FilesController {
             const filesFilter = {
                 userId: ObjectId(userId).toString(),
                 parentId: parentId === '0'
-                  ? parentId
-                  : ObjectId(parentId),
-              };
-          
+                    ? parentId
+                    : ObjectId(parentId).toString(),
+            };
+
 
             // Construct the aggregation pipeline
             // try and add checks for parentId - no need to convert to ObjectId if its 0
@@ -269,7 +269,7 @@ export default class FilesController {
                         }
                     }
 
-                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: file._id }, update);
+                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: ObjectId(file_id), userId: ObjectId(userId).toString() }, update);
 
                     if (updatedFileDoc.matchedCount === 1) {
                         res.status(200).json(file);
@@ -315,7 +315,7 @@ export default class FilesController {
                         }
                     }
 
-                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: file._id }, update);
+                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: ObjectId(file_id), userId: ObjectId(userId).toString() }, update);
 
                     if (updatedFileDoc.matchedCount === 1) {
                         res.status(200).json(file);
