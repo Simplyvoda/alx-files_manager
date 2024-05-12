@@ -198,9 +198,9 @@ export default class FilesController {
 
             const filesFilter = {
                 userId: ObjectId(userId).toString(),
-                parentId: parentId === 0
-                    ? parentId.toString()
-                    : ObjectId(parentId).toString(),
+                // parentId: parentId === 0
+                //     ? parentId.toString()
+                //     : ObjectId(parentId).toString(),
             };
 
 
@@ -273,7 +273,7 @@ export default class FilesController {
                     const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: ObjectId(file_id), userId: ObjectId(userId).toString() }, update);
 
                     if (updatedFileDoc.matchedCount === 1) {
-                        res.status(200).json(file);
+                        res.status(200).json({...file, isPublic: true});
                     }
                 } catch (e) {
                     res.status(500).json({ error: "Internal server error" });
@@ -319,7 +319,7 @@ export default class FilesController {
                     const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: ObjectId(file_id), userId: ObjectId(userId).toString() }, update);
 
                     if (updatedFileDoc.matchedCount === 1) {
-                        res.status(200).json(file);
+                        res.status(200).json({...file, isPublic: false});
                     }
                 } catch (e) {
                     res.status(500).json({ error: "Internal server error" });
