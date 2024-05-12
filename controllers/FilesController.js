@@ -1,6 +1,7 @@
 import { redisClient } from '../utils/redis.js';
 import { dbClient } from '../utils/db.js';
 import { ObjectId } from 'mongodb';
+import mongoDBCore from 'mongodb/lib/core';
 import { v4 as uuidv4 } from 'uuid';
 import { promisify } from 'util';
 import { writeFile, existsSync, mkdirSync, readFile } from 'fs';
@@ -156,6 +157,7 @@ export default class FilesController {
             });
             console.log("check if file id is same as 6640f3b6c96a1d08126e59a6 for request params", file_id)
             console.log("check if file id is same as 6640f3b6c96a1d08126e59a6 or redis object id", ObjectId(file_id))
+            console.log("check if object id is the reason", new mongoDBCore.BSON.ObjectId(file_id))
             console.log("check if file was found", file)
 
             if (!file) {
