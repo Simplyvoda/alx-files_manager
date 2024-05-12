@@ -144,11 +144,7 @@ export default class FilesController {
             _id: ObjectId(user_id)
         });
 
-        console.log("check if user id is same as 663f6c4a68e5d501cd277087 for redis plain id", user_id)
-        console.log("check if user id is same as 663f6c4a68e5d501cd277087 for redis object id", user._id)
-
         if (user) {
-            console.log(user, "why does user work but file does not")
             const userId = user_id.toString();
             const file_id = req.params.id ? req.params.id.toString() : NULL_ID;
 
@@ -156,12 +152,6 @@ export default class FilesController {
                 _id: ObjectId(file_id),
                 userId: ObjectId(userId).toString(),
             });
-
-            const user_file = await (await dbClient.filesCollection()).findOne({
-                _id: ObjectId(file_id),
-            });
-
-            console.log(user_file, "removed user id from query"); // this works so what i can do is compare result make sure file.userId == user_id to string
             
             if (!file) {
                 res.status(404).json({ error: "Not found" });
@@ -197,7 +187,6 @@ export default class FilesController {
         });
 
         if (user) {
-            console.log(user, "why does user work but file does not")
             const parentId = req.query.parentId ? req.query.parentId.toString() : '0';
             const page = /\d+/.test((req.query.page || '').toString())
                 ? Number.parseInt(req.query.page, 10)
@@ -206,10 +195,10 @@ export default class FilesController {
             const skip = page * PAGE_SIZE;
 
             const filesFilter = {
-                userId: user._id,
+                userId: ObjectId(user_id).toString(),
                 parentId: parentId === '0'
                   ? parentId
-                  : ObjectId(parentId),
+                  : ObjectId(parentId).toString(),
               };
           
 
@@ -265,7 +254,7 @@ export default class FilesController {
             const file_id = req.params.id;
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
-                userId: ObjectId(user_id)
+                userId: ObjectId(user_id).toString(),
             });
 
             if (!file) {
@@ -310,7 +299,7 @@ export default class FilesController {
             const file_id = req.params.id;
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
-                userId: ObjectId(user_id)
+                userId: ObjectId(user_id).toString(),
             });
 
             if (!file) {
@@ -354,7 +343,7 @@ export default class FilesController {
             const size = req.query.size || null;
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
-                userId: ObjectId(user_id)
+                userId: ObjectId(user_id).toString(),
             });
 
             // if the user is not the owner of the file
