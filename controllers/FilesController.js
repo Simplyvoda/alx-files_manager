@@ -161,7 +161,7 @@ export default class FilesController {
                 _id: ObjectId(file_id),
             });
 
-            console.log(user_file, "removed user id from query");
+            console.log(user_file, "removed user id from query"); // this works so what i can do is compare result make sure file.userId == user_id to string
             
             if (!file) {
                 res.status(404).json({ error: "Not found" });
