@@ -13,6 +13,8 @@ const writeFileAsync = promisify(writeFile);
 const readFileAsync = promisify(readFile);
 const PAGE_SIZE = 20;
 
+const NULL_ID = Buffer.alloc(24, '0').toString('utf-8');
+
 // Queue for background jobs
 // create bull queue called fileQueue
 const fileQueue = new Bull('fileQueue');
@@ -142,16 +144,26 @@ export default class FilesController {
         });
 
         if (user) {
-            const file_id = req.params.id;
+            const userId = user_id.toString();
+            const file_id = req.params.id ? req.params.id : NULL_ID;
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
-                userId: ObjectId(user_id)
+                userId: user._id
             });
 
             if (!file) {
                 res.status(404).json({ error: "Not found" });
             } else {
-                res.status(200).json(file);
+                res.status(200).json({
+                    file_id,
+                    userId,
+                    name: file.name,
+                    type: file.type,
+                    isPublic: file.isPublic,
+                    parentId: file.parentId === '0'
+                      ? 0
+                      : file.parentId.toString(),
+                  });
             }
 
         } else {
