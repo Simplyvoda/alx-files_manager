@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import mongoDBCore from 'mongodb/lib/core';
 import { v4 as uuidv4 } from 'uuid';
 import { promisify } from 'util';
-import { writeFile, existsSync, mkdirSync, readFile } from 'fs';
+import { writeFile, existsSync, mkdirSync, readFile, realpath } from 'fs';
 import { contentType } from 'mime-types';
 import Bull from 'bull';
 
@@ -12,6 +12,7 @@ import Bull from 'bull';
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
 const writeFileAsync = promisify(writeFile);
 const readFileAsync = promisify(readFile);
+const realpathAsync = promisify(realpath);
 const PAGE_SIZE = 20;
 
 const NULL_ID = Buffer.alloc(24, '0').toString('utf-8');
@@ -163,7 +164,7 @@ export default class FilesController {
                     name: file.name,
                     type: file.type,
                     isPublic: file.isPublic,
-                    parentId: file.parentId === '0'
+                    parentId: file.parentId === 0
                         ? 0
                         : file.parentId.toString(),
                 });
