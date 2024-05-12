@@ -149,10 +149,13 @@ export default class FilesController {
         if (user) {
             const userId = user_id.toString();
             const file_id = req.params.id ? req.params.id : NULL_ID;
+
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
-                userId: user._id
+                userId: ObjectId(user._id)
             });
+            console.log("check if file id is same as 6640f3b6c96a1d08126e59a6 for request params", file_id)
+            console.log("check if file id is same as 6640f3b6c96a1d08126e59a6 or redis object id", file._id)
 
             if (!file) {
                 res.status(404).json({ error: "Not found" });
