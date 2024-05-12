@@ -143,6 +143,9 @@ export default class FilesController {
             _id: ObjectId(user_id)
         });
 
+        console.log("check if user id is same as 663f6c4a68e5d501cd277087 for redis plain id", user_id)
+        console.log("check if user id is same as 663f6c4a68e5d501cd277087 for redis object id", user._id)
+
         if (user) {
             const userId = user_id.toString();
             const file_id = req.params.id ? req.params.id : NULL_ID;
