@@ -3,12 +3,13 @@ import { dbClient } from '../utils/db.js';
 import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { promisify } from 'util';
-import { writeFile, existsSync, mkdirSync } from 'fs';
+import { writeFile, existsSync, mkdirSync, readFile } from 'fs';
 import { tmpdir } from 'os';
-import { error } from 'console';
+import mimeTypes from 'mime-types';
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
 const writeFileAsync = promisify(writeFile);
+const readFileAsync = promisify(readFile);
 const PAGE_SIZE = 20;
 
 export default class FilesController {
@@ -270,6 +271,51 @@ export default class FilesController {
 
         } else {
             res.status(401).json({ error: "Unauthorized" })
+        }
+
+    }
+
+    static async getFile(req, res) {
+        const token = req.headers['x-token'];
+        const key = `auth_${token}`;
+
+        const user_id = await redisClient.get(key);
+
+        const user = await (await dbClient.usersCollection()).findOne({
+            _id: ObjectId(user_id)
+        });
+
+        if(user){
+            const file_id = req.params.id;
+            const file = await (await dbClient.filesCollection()).findOne({
+                _id: ObjectId(file_id),
+                userId: ObjectId(user_id)
+            });
+
+            // if the user is not the owner of the file
+            // if the files isnt public
+            if (!file || !file.isPublic) {
+                res.status(404).json({ error: "Not found" });
+            } else {
+                if (file.type === "folder"){
+                    res.status(400).json({ error: "A folder doesn\'t have content " });
+                }else{
+                    // if checker fails this try adding file size to the file path
+                    const fileData = await readFileAsync(file.localPath);
+                    if(!fileData){
+                        // if there is no file data or the file is empty
+                        res.status(404).json({ error: "Not found" });
+                    }else{
+                        // by using mime-types get MIME-type based on file name
+                        // return file content with correct mime type
+                        const mimeType = mime.lookup(file.name);
+                        res.setHeader('Content-Type', mimeType || 'text/plain; charset=utf-8');
+                        res.status(200).sendFile(file.localPath);
+                    }
+                }
+            }
+        }else{
+            res.status(401).json({ error: "Not found" })
         }
 
     }
