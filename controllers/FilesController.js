@@ -188,7 +188,8 @@ export default class FilesController {
 
         if (user) {
             const userId = user_id.toString();
-            const parentId = req.query.parentId ? req.query.parentId.toString() : '0';
+            console.log(typeof(user_id), "wondering why this needs to converted")
+            const parentId = req.query.parentId ? req.query.parentId : 0;
             const page = /\d+/.test((req.query.page || '').toString())
                 ? Number.parseInt(req.query.page, 10)
                 : 0;
@@ -197,8 +198,8 @@ export default class FilesController {
 
             const filesFilter = {
                 userId: ObjectId(userId).toString(),
-                parentId: parentId === '0'
-                    ? parentId
+                parentId: parentId === 0
+                    ? parentId.toString()
                     : ObjectId(parentId).toString(),
             };
 
