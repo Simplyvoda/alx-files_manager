@@ -176,14 +176,20 @@ export default class FilesController {
                 ? Number.parseInt(req.query.page, 10)
                 : 0;
 
-            console.log("logging parent id and page", parentId, page)
-
             const skip = page * PAGE_SIZE;
+
+            const filesFilter = {
+                userId: user._id,
+                parentId: parentId === '0'
+                  ? parentId
+                  : ObjectId(parentId),
+              };
+          
 
             // Construct the aggregation pipeline
             // try and add checks for parentId - no need to convert to ObjectId if its 0
             const pipeline = [
-                { $match: { parentId: `${parentId == '0' ? '0' : ObjectId(parentId)}`, userId: user._id } },
+                { $match: filesFilter },
                 { $skip: skip },
                 { $limit: PAGE_SIZE },
                 {
@@ -203,6 +209,8 @@ export default class FilesController {
 
             // Execute the aggregation pipeline
             const results = await (await dbClient.filesCollection()).aggregate(pipeline).toArray();
+
+            console.log(results, "results of aggregation pipeline");
 
             // Return the paginated results
             res.status(200).json(results);
