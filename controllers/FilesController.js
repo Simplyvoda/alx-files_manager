@@ -171,9 +171,10 @@ export default class FilesController {
             _id: ObjectId(user_id)
         });
         if (user) {
-            const { parentId, page } = req.query;
-            parentId ? parentId : '0';
-            page ? parseInt(page) : 0;
+            const parentId = req.query.parentId || '0';
+            const page = /\d+/.test((req.query.page || '').toString())
+                ? Number.parseInt(req.query.page, 10)
+                : 0;
 
             console.log("logging parent id and page", parentId, page)
 
@@ -187,17 +188,17 @@ export default class FilesController {
                 { $limit: PAGE_SIZE },
                 {
                     $project: {
-                      _id: 0,
-                      id: '$_id',
-                      userId: '$userId',
-                      name: '$name',
-                      type: '$type',
-                      isPublic: '$isPublic',
-                      parentId: {
-                        $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
-                      },
+                        _id: 0,
+                        id: '$_id',
+                        userId: '$userId',
+                        name: '$name',
+                        type: '$type',
+                        isPublic: '$isPublic',
+                        parentId: {
+                            $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+                        },
                     },
-                  },
+                },
             ];
 
             // Execute the aggregation pipeline
