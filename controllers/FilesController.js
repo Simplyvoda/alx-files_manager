@@ -180,7 +180,7 @@ export default class FilesController {
             // Construct the aggregation pipeline
             // try and add checks for parentId - no need to convert to ObjectId if its 0
             const pipeline = [
-                { $match: { parentId: ObjectId(parentId), userId: user._id } },
+                { $match: { parentId: `${parentId == '0' ? '0' : ObjectId(parentId)}`, userId: user._id } },
                 { $skip: skip },
                 { $limit: PAGE_SIZE },
                 {
