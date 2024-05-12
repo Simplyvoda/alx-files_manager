@@ -4,13 +4,19 @@ import { ObjectId } from 'mongodb';
 import { v4 as uuidv4 } from 'uuid';
 import { promisify } from 'util';
 import { writeFile, existsSync, mkdirSync, readFile } from 'fs';
-import { tmpdir } from 'os';
 import { contentType } from 'mime-types';
+import Bull from 'bull';
+import { imageThumbnail } from 'image-thumbnail';
+import path from 'path';
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
 const writeFileAsync = promisify(writeFile);
 const readFileAsync = promisify(readFile);
 const PAGE_SIZE = 20;
+
+// Queue for background jobs
+// create bull queue called fileQueue
+const fileQueue = new Bull('fileQueue');
 
 export default class FilesController {
     static async postUpload(req, res) {
@@ -93,9 +99,17 @@ export default class FilesController {
                 const fileData = Buffer.from(base64Data, 'base64');
                 // writing the file to disk
                 await writeFileAsync(localPath, fileData);
+
                 const updatedFileDoc = { ...folderDoc, localPath: localPath }
                 const newFileInfo = await (await dbClient.filesCollection()).insertOne(updatedFileDoc);
                 const newFileId = newFileInfo.insertedId.toString();
+
+                // initiate jobs for generating thumbnails when file is created
+                if (type === 'image') {
+                    const jobData = { userId: userId, fileId: newFileId };
+                    await fileQueue.add(jobData);
+                }
+
                 res.status(201).json({
                     "id": newFileId,
                     "userId": userId,
@@ -214,7 +228,7 @@ export default class FilesController {
                         }
                     }
 
-                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: file._id}, update);
+                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: file._id }, update);
 
                     if (updatedFileDoc.matchedCount === 1) {
                         res.status(200).json(file);
@@ -259,7 +273,7 @@ export default class FilesController {
                         }
                     }
 
-                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: file._id}, update);
+                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: file._id }, update);
 
                     if (updatedFileDoc.matchedCount === 1) {
                         res.status(200).json(file);
@@ -285,8 +299,9 @@ export default class FilesController {
             _id: ObjectId(user_id)
         });
 
-        if(user){
+        if (user) {
             const file_id = req.params.id;
+            const size = req.query.size || null;
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
                 userId: ObjectId(user_id)
@@ -297,19 +312,19 @@ export default class FilesController {
             if (!file || !file.isPublic) {
                 res.status(404).json({ error: "Not found" });
             } else {
-                if (file.type === "folder"){
+                if (file.type === "folder") {
                     res.status(400).json({ error: "A folder doesn\'t have content " });
-                }else{
+                } else {
                     // if checker fails this try adding file size to the file path
                     let filePath = file.localPath;
                     if (size) {
-                      filePath = `${file.localPath}_${size}`;
+                        filePath = `${file.localPath}_${size}`;
                     }
                     const fileData = await readFileAsync(filePath);
-                    if(!fileData){
+                    if (!fileData) {
                         // if there is no file data or the file is empty
                         res.status(404).json({ error: "Not found" });
-                    }else{
+                    } else {
                         // by using mime-types get MIME-type based on file name
                         // return file content with correct mime type
                         const absoluteFilePath = await realpathAsync(filePath);
@@ -318,7 +333,7 @@ export default class FilesController {
                     }
                 }
             }
-        }else{
+        } else {
             res.status(401).json({ error: "Not found" })
         }
 
