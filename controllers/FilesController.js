@@ -6,8 +6,7 @@ import { promisify } from 'util';
 import { writeFile, existsSync, mkdirSync, readFile } from 'fs';
 import { contentType } from 'mime-types';
 import Bull from 'bull';
-import { imageThumbnail } from 'image-thumbnail';
-import path from 'path';
+
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
 const writeFileAsync = promisify(writeFile);
