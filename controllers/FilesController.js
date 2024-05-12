@@ -154,7 +154,7 @@ export default class FilesController {
 
             const file = await (await dbClient.filesCollection()).findOne({
                 _id: ObjectId(file_id),
-                userId: ObjectId(userId)
+                userId: ObjectId(userId).toString(),
             });
 
             const user_file = await (await dbClient.filesCollection()).findOne({
