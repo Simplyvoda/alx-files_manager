@@ -155,7 +155,7 @@ export default class FilesController {
                 userId: ObjectId(userId)
             });
             console.log("check if file id is same as 6640f3b6c96a1d08126e59a6 for request params", file_id)
-            console.log("check if file id is same as 6640f3b6c96a1d08126e59a6 or redis object id", ObjectId)
+            console.log("check if file id is same as 6640f3b6c96a1d08126e59a6 or redis object id", ObjectId(file_id))
 
             if (!file) {
                 res.status(404).json({ error: "Not found" });
