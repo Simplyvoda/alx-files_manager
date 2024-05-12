@@ -155,14 +155,15 @@ export default class FilesController {
                 _id: ObjectId(file_id),
                 userId: ObjectId(userId)
             });
+
             console.log("check if file id is same as 6640f3b6c96a1d08126e59a6 for request params", file_id)
             console.log("check if file id is same as 6640f3b6c96a1d08126e59a6 or redis object id", ObjectId(file_id))
             console.log("check if object id is the reason", new mongoDBCore.BSON.ObjectId(file_id))
-            console.log("check if file was found", file)
-
+            
             if (!file) {
                 res.status(404).json({ error: "Not found" });
             } else {
+                console.log("check if file was found", file)
                 res.status(200).json({
                     file_id,
                     userId,
@@ -191,6 +192,7 @@ export default class FilesController {
         const user = await (await dbClient.usersCollection()).findOne({
             _id: ObjectId(user_id)
         });
+
         if (user) {
             const parentId = req.query.parentId || '0';
             const page = /\d+/.test((req.query.page || '').toString())
@@ -229,7 +231,7 @@ export default class FilesController {
             ];
 
             // Execute the aggregation pipeline
-            const results = await (await dbClient.filesCollection()).aggregate(pipeline).toArray();
+            const results = await (await (await dbClient.filesCollection()).aggregate(pipeline)).toArray();
 
             console.log(results, "results of aggregation pipeline");
 
