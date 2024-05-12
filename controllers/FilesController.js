@@ -198,9 +198,9 @@ export default class FilesController {
 
             const filesFilter = {
                 userId: ObjectId(userId).toString(),
-                // parentId: parentId === 0
-                //     ? parentId.toString()
-                //     : ObjectId(parentId).toString(),
+                parentId: parentId === 0
+                    ? parentId
+                    : ObjectId(parentId).toString(),
             };
 
 
