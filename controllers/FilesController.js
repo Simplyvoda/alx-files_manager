@@ -183,4 +183,94 @@ export default class FilesController {
 
 
     }
+
+    static async putPublish(req, res) {
+        // find the file based on the id
+        // set isPublic to true
+        const token = req.headers['x-token'];
+        const key = `auth_${token}`;
+
+        const user_id = await redisClient.get(key);
+
+        const user = await (await dbClient.usersCollection()).findOne({
+            _id: ObjectId(user_id)
+        });
+
+        if (user) {
+            const file_id = req.params.id;
+            const file = await (await dbClient.filesCollection()).findOne({
+                _id: ObjectId(file_id),
+                userId: ObjectId(user_id)
+            });
+
+            if (!file) {
+                res.status(404).json({ error: "Not found" });
+            } else {
+                try {
+                    const update = {
+                        $set: {
+                            isPublic: true
+                        }
+                    }
+
+                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: file._id}, update);
+
+                    if (updatedFileDoc.matchedCount === 1) {
+                        res.status(200).json(file);
+                    }
+                } catch (e) {
+                    res.status(500).json({ error: "Internal server error" });
+                }
+            }
+
+        } else {
+            res.status(401).json({ error: "Unauthorized" })
+        }
+
+    }
+
+    static async putUnPublish(req, res) {
+        // find the file based on the id
+        // set isPublic to false
+        const token = req.headers['x-token'];
+        const key = `auth_${token}`;
+
+        const user_id = await redisClient.get(key);
+
+        const user = await (await dbClient.usersCollection()).findOne({
+            _id: ObjectId(user_id)
+        });
+
+        if (user) {
+            const file_id = req.params.id;
+            const file = await (await dbClient.filesCollection()).findOne({
+                _id: ObjectId(file_id),
+                userId: ObjectId(user_id)
+            });
+
+            if (!file) {
+                res.status(404).json({ error: "Not found" });
+            } else {
+                try {
+                    const update = {
+                        $set: {
+                            isPublic: false
+                        }
+                    }
+
+                    const updatedFileDoc = await (await dbClient.filesCollection()).updateOne({ _id: file._id}, update);
+
+                    if (updatedFileDoc.matchedCount === 1) {
+                        res.status(200).json(file);
+                    }
+                } catch (e) {
+                    res.status(500).json({ error: "Internal server error" });
+                }
+            }
+
+        } else {
+            res.status(401).json({ error: "Unauthorized" })
+        }
+
+    }
 }
