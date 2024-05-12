@@ -182,7 +182,20 @@ export default class FilesController {
             const pipeline = [
                 { $match: { parentId: ObjectId(parentId), userId: user._id } },
                 { $skip: skip },
-                { $limit: PAGE_SIZE }
+                { $limit: PAGE_SIZE },
+                {
+                    $project: {
+                      _id: 0,
+                      id: '$_id',
+                      userId: '$userId',
+                      name: '$name',
+                      type: '$type',
+                      isPublic: '$isPublic',
+                      parentId: {
+                        $cond: { if: { $eq: ['$parentId', '0'] }, then: 0, else: '$parentId' },
+                      },
+                    },
+                  },
             ];
 
             // Execute the aggregation pipeline
