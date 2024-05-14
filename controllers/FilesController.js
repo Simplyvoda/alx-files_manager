@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { promisify } from 'util';
 import { writeFile, existsSync, mkdirSync, readFile, realpath } from 'fs';
 import { contentType } from 'mime-types';
-import Bull from 'bull';
+import Queue from 'bull/lib/queue';
 
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -19,7 +19,7 @@ const NULL_ID = Buffer.alloc(24, '0').toString('utf-8');
 
 // Queue for background jobs
 // create bull queue called fileQueue
-const fileQueue = new Bull('fileQueue');
+const fileQueue = new Queue('fileQueue');
 
 export default class FilesController {
     static async postUpload(req, res) {

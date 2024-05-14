@@ -2,7 +2,11 @@ import sha1 from 'sha1';
 import { dbClient } from '../utils/db.js'
 import { redisClient } from '../utils/redis.js'
 import { ObjectId } from 'mongodb';
+import Queue from 'bull/lib/queue';
 
+// Queue for background jobs
+// create bull queue called userQueue
+const userQueue = new Queue('userQueue');
 export default class UsersController {
     static async postNew(req, res){
         const email = req.body ? req.body.email : null;
@@ -37,7 +41,14 @@ export default class UsersController {
 
             // adding user to database
             const result = await (await dbClient.usersCollection()).insertOne(newUser);
-            const generatedId = result.insertedId;
+            const generatedId = result.insertedId.toString();
+
+            // initiate job to send user welcom email
+            if (generatedId) {
+                const jobData = { userId: generatedId };
+                await userQueue.add(jobData);
+            }
+
             res.status(201).json({
                 "id" : generatedId,
                 "email": newUser.email

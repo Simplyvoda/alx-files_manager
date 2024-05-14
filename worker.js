@@ -1,13 +1,15 @@
-import Bull from 'bull';
+import Queue from 'bull/lib/queue';
 import { imageThumbnail } from 'image-thumbnail';
 import { dbClient } from './utils/db.js';
 import { ObjectId } from 'mongodb';
 import { promisify } from 'util';
 import { writeFile } from 'fs';
 
-const fileQueue = new Bull('fileQueue');
+const fileQueue = new Queue('fileQueue');
+const userQueue = new Queue('userQueue');
 const writeFileAsync = promisify(writeFile);
 
+// create thumbnail emojis at the background
 fileQueue.process(async (job, done) => {
     const { userId, fileId } = job.data;
 
@@ -42,6 +44,31 @@ fileQueue.process(async (job, done) => {
             return writeFileAsync(thumbnailPath, thumb)
         })
     ).then(() => { done(); });
+
+})
+
+// send welcome email to user at the background
+// can use third party libraries like mailgun to send welcome email in real life
+userQueue.process(async (job, done) => {
+    const { userId } = job.data;
+
+    if (!userId) {
+        throw new Error("Missing userId");
+    }
+
+    console.log('Processing', job.data.name || '');
+
+    const user = await (await dbClient.usersCollection()).findOne({
+        _id: ObjectId(userId)
+    });
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    // send welcome email to user
+    console.log(`welcome ${user.email}!`);
+    done();
 
 })
 
